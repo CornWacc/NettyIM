@@ -40,7 +40,8 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        super.channelRead(ctx, msg);
+
+        System.out.println(msg);
     }
 
     @Override
