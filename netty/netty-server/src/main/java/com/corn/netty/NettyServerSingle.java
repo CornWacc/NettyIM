@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NettyServerSingle {
 
@@ -20,9 +21,6 @@ public class NettyServerSingle {
      * 当前连接人员集合映射
      * */
     private List<User> users = new ArrayList<>();
-
-
-
 
     public List<User> getUsers() {
         return users;

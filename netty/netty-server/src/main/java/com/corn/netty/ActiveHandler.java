@@ -2,10 +2,13 @@ package com.corn.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
@@ -29,11 +32,11 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
         String[] strings = String.valueOf(msg).split("/");
 
-        System.out.println(Arrays.toString(strings));
-        String type = strings[0]; //single/all
-        String chatType = strings[1];
-        String userName = strings[2];
-        String addition = strings[3]; //区分是正文内容或者是起始校验码
+        String type = strings[0]; //init/say
+        String chatType = strings[1];//single/all
+        String userName = strings[2]; //当前用户
+        String toUser = strings[3]; //接受用户
+        String addition = strings[4]; //区分是正文内容或者是起始校验码
 
 
         //如果解析出来的数据type是初始化则新增上线用户
@@ -42,6 +45,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
             System.out.println(new Date()+":"+userName+ctx.channel().remoteAddress()+" 上线");
 
             increase(ctx,userName);
+
             //每有一次用户连接服务器则向全部发送心跳包
             List<User> list = nettyServerSingle.getUsers(); //赋值,并没有直接遍历该集合
 
@@ -66,17 +70,27 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
                 }
             }
 
-            System.out.println(upUser.toString());
-
             ByteBuf byteBuf = getByteBuf(ctx,upUser.toString()); // 转发给登陆人,告示在线用户
             ctx.writeAndFlush(byteBuf);
 
-
         }else{
+
             System.out.println(new Date()+" 获取到信息 "+ctx.channel().remoteAddress()+":"+addition);
+
+            //转发信息
+            User user = new User();
+
+            for(User res : nettyServerSingle.getUsers()){
+
+                //取出收取人的通道
+                if(res.getUserName().equals(toUser)){
+                    user = res;
+                    user.getChannelHandlerContext().writeAndFlush(getByteBuf(user.getChannelHandlerContext(),addition));
+                }
+            }
+
         }
 
-        //转发信息
 
     }
 
@@ -100,6 +114,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void addPeople(String name,ChannelHandlerContext channelHandlerContext){
+
 
         User user = new User();
         user.setChannelHandlerContext(channelHandlerContext);

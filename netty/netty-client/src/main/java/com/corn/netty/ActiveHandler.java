@@ -46,7 +46,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
                 if(line.equals("") || line == null){
                     System.out.println(new Date()+":信息不能输入为空!");
                 }else {
-                    String next = "say/single/userName/"+line; //区分校验码,防止list空指针
+                    String next = "say/single/"+userName+"/"+toUserName+"/"+line; //区分校验码,防止list空指针
 
                     ByteBuf to = getByteBuf(ctx,next);
                     ctx.writeAndFlush(to);
