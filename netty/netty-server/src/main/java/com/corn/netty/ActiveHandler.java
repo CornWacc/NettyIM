@@ -4,9 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.util.*;
 
 public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
@@ -30,19 +29,24 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
         String[] strings = String.valueOf(msg).split("/");
 
-        String type = strings[0];
+        System.out.println(Arrays.toString(strings));
+        String type = strings[0]; //single/all
         String chatType = strings[1];
         String userName = strings[2];
-        String toUserName= strings[3];
+        String addition= strings[3]; //区分是正文内容或者是起始校验码
 
         //如果解析出来的数据type是初始化则新增上线用户
         if(type.equals("init")){
+
+            System.out.println(new Date()+":"+userName+ctx.channel().remoteAddress()+" 上线");
 
             increase(ctx,userName);
             //每有一次用户连接服务器则向全部发送心跳包
             List<User> list = nettyServerSingle.getUsers(); //赋值,并没有直接遍历该集合
 
             StringBuffer upUser = new StringBuffer();
+
+            upUser.append("/init/single/userName"); //初始化响应客户端连接
             upUser.append("当前在线用户列表:");
 
             Iterator<User> iterator = list.iterator();
@@ -61,12 +65,14 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
                 }
             }
 
-            ByteBuf byteBuf = getByteBuf(ctx,upUser); // 转发给登陆人,告示在线用户
+            System.out.println(upUser.toString());
+
+            ByteBuf byteBuf = getByteBuf(ctx,upUser.toString()); // 转发给登陆人,告示在线用户
             ctx.writeAndFlush(byteBuf);
 
 
         }else{
-            System.out.println(new Date()+" 获取到信息 "+ctx.channel().remoteAddress()+":"+msg);
+            System.out.println(new Date()+" 获取到信息 "+ctx.channel().remoteAddress()+":"+addition);
         }
 
         //转发信息
@@ -75,6 +81,8 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+
+        cause.printStackTrace();
 
         System.out.println(new Date()+":"+ctx.channel().remoteAddress() +" 下线");
 
@@ -95,6 +103,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
         User user = new User();
         user.setChannelHandlerContext(channelHandlerContext);
         user.setUserName(name);
+        user.setAddress(channelHandlerContext.channel().remoteAddress().toString());
         //往全局人员管理里面新增一个用户上线
         nettyServerSingle.getUsers().add(user);
     }
@@ -102,11 +111,11 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
     /**
      * 获取ByteBuf
      * */
-    private ByteBuf getByteBuf(ChannelHandlerContext context,StringBuffer stringBuffer){
+    private ByteBuf getByteBuf(ChannelHandlerContext context,String s){
 
-        ByteBuf byteBuf = context.channel().alloc().buffer();
+        ByteBuf byteBuf = context.alloc().buffer();
 
-        byte[] bytes = stringBuffer.toString().getBytes();
+        byte[] bytes = s.getBytes(Charset.forName("UTF-8"));
 
         byteBuf.writeBytes(bytes);
 

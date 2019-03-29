@@ -11,6 +11,16 @@ public class User {
 
     private ChannelHandlerContext channelHandlerContext;
 
+    private String address;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getUserName() {
         return userName;
     }

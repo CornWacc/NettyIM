@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.Scanner;
 
 public class ActiveHandler extends ChannelInboundHandlerAdapter {
@@ -26,22 +27,28 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = getByteBuf(ctx,md);
         ctx.writeAndFlush(byteBuf);
 
-        System.out.println("********** 聊天室建立成功,可以开始聊天 **********");
-        Scanner scanner = new Scanner(System.in);
 
-//        while(true){
-//
-//            String next = "say/single/userName/"+scanner.nextLine(); //区分校验码,防止list空指针
-//
-//            ByteBuf to = getByteBuf(ctx,next);
-//            ctx.writeAndFlush(to);
-//        }
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-        System.out.println(msg.toString());
+        String[] strings = String.valueOf(msg).split("/");
+
+        if(strings[0].equals("init")){
+            System.out.println(new Date()+":与服务端连接建立成功,"+msg.toString());
+            System.out.println("********** 聊天室创建成功,可以开始聊天 **********");
+            Scanner scanner = new Scanner(System.in);
+
+            while(true){
+
+                String next = "say/single/userName/"+scanner.nextLine(); //区分校验码,防止list空指针
+
+                ByteBuf to = getByteBuf(ctx,next);
+                ctx.writeAndFlush(to);
+            }
+        }
+
     }
 
     @Override
