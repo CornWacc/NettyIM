@@ -15,6 +15,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
     private String toUserName;
 
+
     public ActiveHandler(String userName,String toUserName) {
         this.userName = userName;
         this.toUserName = toUserName;
@@ -27,32 +28,33 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = getByteBuf(ctx,md);
         ctx.writeAndFlush(byteBuf);
 
-
     }
 
+    /**
+     * 1.该逻辑处理器里面仅获取开局校验码
+     * 2.该处理器也处理连接成功接收开局校验码后的信息输入
+     * */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         String[] strings = String.valueOf(msg).split("/");
 
-        if(strings[0].equals("init")){
-            System.out.println(new Date()+":与服务端连接建立成功,"+strings[strings.length-1]);
-            System.out.println("********** 聊天室创建成功,可以开始聊天 **********");
+        System.out.println(new Date()+":与服务端连接建立成功,"+strings[strings.length-1]);
+        System.out.println("********** 聊天室创建成功,可以开始聊天 **********");
 
-            while(true){
-                Scanner scanner = new Scanner(System.in);
-                String line = scanner.nextLine();
+        while(true){
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
 
-                if(line.equals("") || line == null){
-                    System.out.println(new Date()+":信息不能输入为空!");
-                }else {
-                    String next = "say/single/"+userName+"/"+toUserName+"/"+line; //区分校验码,防止list空指针
+            if(line.equals("") || line == null){
+                System.out.println(new Date()+":信息不能输入为空!");
+            }else {
+                String next = "say/single/"+userName+"/"+toUserName+"/"+line; //区分校验码,防止list空指针,发送给服务端进行解析
 
-                    ByteBuf to = getByteBuf(ctx,next);
-                    ctx.writeAndFlush(to);
-                }
-
+                ByteBuf to = getByteBuf(ctx,next);
+                ctx.writeAndFlush(to);
             }
+
         }
 
     }
@@ -60,7 +62,6 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
-        System.out.println("close");
     }
 
 

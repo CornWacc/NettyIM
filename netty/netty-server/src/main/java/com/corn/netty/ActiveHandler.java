@@ -2,13 +2,12 @@ package com.corn.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
@@ -42,7 +41,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
         //如果解析出来的数据type是初始化则新增上线用户
         if(type.equals("init")){
 
-            System.out.println(new Date()+":"+userName+ctx.channel().remoteAddress()+" 上线");
+            System.out.println(new Date()+":"+userName+ctx.channel().remoteAddress()+" 用户名:"+userName+" 上线");
 
             increase(ctx,userName);
 
@@ -75,17 +74,18 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
         }else{
 
-            System.out.println(new Date()+" 获取到信息 "+ctx.channel().remoteAddress()+":"+addition);
+            System.out.println(new Date()+" 接收信息: "+ctx.channel().remoteAddress()+"/"+userName+":"+addition+" **** 发送至: "+toUser);
 
             //转发信息
-            User user = new User();
 
             for(User res : nettyServerSingle.getUsers()){
 
                 //取出收取人的通道
                 if(res.getUserName().equals(toUser)){
-                    user = res;
-                    user.getChannelHandlerContext().writeAndFlush(getByteBuf(user.getChannelHandlerContext(),addition));
+                    System.out.println(1);
+
+                    ByteBuf byteBuf = getByteBuf(res.getChannelHandlerContext(),addition);
+                    res.getChannelHandlerContext().writeAndFlush(byteBuf);
                 }
             }
 
