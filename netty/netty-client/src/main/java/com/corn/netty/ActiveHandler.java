@@ -29,13 +29,13 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
         System.out.println("********** 聊天室建立成功,可以开始聊天 **********");
         Scanner scanner = new Scanner(System.in);
 
-        while(true){
-
-            String next = "say/single/userName/"+scanner.nextLine(); //区分校验码,防止list空指针
-
-            ByteBuf to = getByteBuf(ctx,next);
-            ctx.writeAndFlush(to);
-        }
+//        while(true){
+//
+//            String next = "say/single/userName/"+scanner.nextLine(); //区分校验码,防止list空指针
+//
+//            ByteBuf to = getByteBuf(ctx,next);
+//            ctx.writeAndFlush(to);
+//        }
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        System.out.println(cause);
+        cause.printStackTrace();
         System.out.println("close");
     }
 
