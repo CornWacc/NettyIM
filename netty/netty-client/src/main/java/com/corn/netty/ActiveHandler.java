@@ -28,20 +28,25 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = getByteBuf(ctx,md);
         ctx.writeAndFlush(byteBuf);
 
-        while(true){
-            Scanner scanner = new Scanner(System.in);
-            String line = scanner.nextLine();
+        new Thread(){
+            @Override
+            public void run() {
+                while(true){
+                    Scanner scanner = new Scanner(System.in);
+                    String line = scanner.nextLine();
 
-            if(line.equals("") || line == null){
-                System.out.println(new Date()+":信息不能输入为空!");
-            }else {
-                String next = "say/single/"+userName+"/"+toUserName+"/"+line; //区分校验码,防止list空指针,发送给服务端进行解析
+                    if(line.equals("") || line == null){
+                        System.out.println(new Date()+":信息不能输入为空!");
+                    }else {
+                        String next = "say/single/"+userName+"/"+toUserName+"/"+line; //区分校验码,防止list空指针,发送给服务端进行解析
 
-                ByteBuf to = getByteBuf(ctx,next);
-                ctx.writeAndFlush(to);
+                        ByteBuf to = getByteBuf(ctx,next);
+                        ctx.writeAndFlush(to);
+                    }
+
+                }
             }
-
-        }
+        }.start();
 
     }
 
