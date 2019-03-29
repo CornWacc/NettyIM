@@ -33,7 +33,8 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
         String type = strings[0]; //single/all
         String chatType = strings[1];
         String userName = strings[2];
-        String addition= strings[3]; //区分是正文内容或者是起始校验码
+        String addition = strings[3]; //区分是正文内容或者是起始校验码
+
 
         //如果解析出来的数据type是初始化则新增上线用户
         if(type.equals("init")){
@@ -46,7 +47,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
             StringBuffer upUser = new StringBuffer();
 
-            upUser.append("/init/single/userName"); //初始化响应客户端连接
+            upUser.append("init/single/userName/"); //初始化响应客户端连接
             upUser.append("当前在线用户列表:");
 
             Iterator<User> iterator = list.iterator();
