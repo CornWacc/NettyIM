@@ -50,7 +50,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
             StringBuffer upUser = new StringBuffer();
 
-            upUser.append("init/single/userName/"); //初始化响应客户端连接
+            upUser.append("init/single/userName/toUser/"); //初始化响应客户端连接
             upUser.append("当前在线用户列表:");
 
             Iterator<User> iterator = list.iterator();
@@ -82,9 +82,14 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
                 //取出收取人的通道
                 if(res.getUserName().equals(toUser)){
-                    System.out.println(1);
 
-                    ByteBuf byteBuf = getByteBuf(res.getChannelHandlerContext(),addition);
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append("say/single/");
+                    stringBuffer.append(userName+"/");
+                    stringBuffer.append(toUser+"/");
+                    stringBuffer.append(addition);
+
+                    ByteBuf byteBuf = getByteBuf(res.getChannelHandlerContext(),stringBuffer.toString());
                     res.getChannelHandlerContext().writeAndFlush(byteBuf);
                 }
             }
