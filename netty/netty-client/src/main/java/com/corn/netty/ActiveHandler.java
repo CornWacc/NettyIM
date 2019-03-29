@@ -31,7 +31,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
         while(true){
 
-            String next = scanner.nextLine();
+            String next = "say/single/userName/"+scanner.nextLine(); //区分校验码,防止list空指针
 
             ByteBuf to = getByteBuf(ctx,next);
             ctx.writeAndFlush(to);
@@ -41,11 +41,12 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-        System.out.println(msg);
+        System.out.println(msg.toString());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        System.out.println(cause);
         System.out.println("close");
     }
 
