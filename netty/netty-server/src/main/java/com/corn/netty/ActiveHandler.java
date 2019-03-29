@@ -1,5 +1,6 @@
 package com.corn.netty;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -46,23 +47,23 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
 
             Iterator<User> iterator = list.iterator();
 
-            while(iterator.hasNext()){
+            while(iterator.hasNext()) {
 
                 User user = iterator.next();
-                if(user.getChannelHandlerContext().channel().isActive()){
+                if (user.getChannelHandlerContext().channel().isActive()) {
                     upUser.append(user.getUserName());
                     upUser.append(",");
 
                 } else {
-                    nettyServerSingle.setConnectCount(nettyServerSingle.getConnectCount()-1); //减少连接数
+                    nettyServerSingle.setConnectCount(nettyServerSingle.getConnectCount() - 1); //减少连接数
                     user.getChannelHandlerContext().close(); //关闭连接
                     iterator.remove(); //剔除当前下线用户,这里删除完了原来的list里面的东西也没了??
                 }
             }
-            System.out.println(list.toString());
 
+            ByteBuf byteBuf = getByteBuf(ctx,upUser); // 转发给登陆人,告示在线用户
+            ctx.writeAndFlush(byteBuf);
 
-            System.out.println(nettyServerSingle.getUsers().size());
 
         }else{
             System.out.println(new Date()+" 获取到信息 "+ctx.channel().remoteAddress()+":"+msg);
@@ -75,7 +76,6 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 
-        cause.printStackTrace();
         System.out.println(new Date()+":"+ctx.channel().remoteAddress() +" 下线");
 
         nettyServerSingle.getUsers().remove(ctx);//用户列表删除该用户
@@ -100,7 +100,21 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * @param ctx
+     * 获取ByteBuf
+     * */
+    private ByteBuf getByteBuf(ChannelHandlerContext context,StringBuffer stringBuffer){
+
+        ByteBuf byteBuf = context.channel().alloc().buffer();
+
+        byte[] bytes = stringBuffer.toString().getBytes();
+
+        byteBuf.writeBytes(bytes);
+
+        return byteBuf;
+    }
+
+    /**
+     * @param ctx 转发的人的通道
      * */
     private void Forward(ChannelHandlerContext ctx){
 
