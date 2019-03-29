@@ -23,7 +23,7 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        String md = "init/single/"+userName+"/"+toUserName; //生成对应校验字符串
+        String md = "init/single/"+userName+"/"+toUserName+"/addition"; //生成对应校验字符串
         ByteBuf byteBuf = getByteBuf(ctx,md);
         ctx.writeAndFlush(byteBuf);
 
