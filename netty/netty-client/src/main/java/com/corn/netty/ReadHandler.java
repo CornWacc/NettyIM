@@ -25,7 +25,7 @@ public class ReadHandler extends ChannelInboundHandlerAdapter {
 
         if(type.equals("init")){
 
-            System.out.println(new Date()+":与服务端连接建立成功,"+strings[strings.length-1]);
+            System.out.println(new Date()+":与服务端连接建立成功");
             System.out.println("********** 聊天室创建成功,可以开始聊天 **********");
 
             System.out.println(new Date()+":"+addition);
