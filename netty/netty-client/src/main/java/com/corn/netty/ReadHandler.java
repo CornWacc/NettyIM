@@ -2,6 +2,7 @@ package com.corn.netty;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.Date;
 
@@ -9,13 +10,11 @@ import java.util.Date;
 /**
  * 仅用于读取数据
  * */
-public class ReadHandler extends ChannelInboundHandlerAdapter {
+public class ReadHandler extends SimpleChannelInboundHandler<Object> {
+
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
-
-
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object msg) throws Exception {
         String[] strings = String.valueOf(msg).split("/");
         String type = strings[0]; //init/say
         String chatType = strings[1];//single/all

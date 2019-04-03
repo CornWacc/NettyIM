@@ -1,5 +1,6 @@
 package com.corn.netty;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -89,7 +90,13 @@ public class ActiveHandler extends ChannelInboundHandlerAdapter {
                     stringBuffer.append(toUser+"/");
                     stringBuffer.append(addition);
 
-                    ByteBuf byteBuf = getByteBuf(res.getChannelHandlerContext(),stringBuffer.toString());
+                    User user = new User();
+                    user.setAddress("d");
+                    user.setUserName("d");
+
+                    String json = JSON.toJSONString(user);
+
+                    ByteBuf byteBuf = getByteBuf(res.getChannelHandlerContext(),json);
                     res.getChannelHandlerContext().writeAndFlush(byteBuf);
                 }
             }
